@@ -129,11 +129,10 @@
 			this.picker.on({
 				touchstart: $.proxy(this.mousedown, this)
 			});
-		} else {
-			this.picker.on({
-				mousedown: $.proxy(this.mousedown, this)
-			});
 		}
+		this.picker.on({
+			mousedown: $.proxy(this.mousedown, this)
+		});
 
 		if (tooltip === 'show') {
 			this.picker.on({
@@ -193,7 +192,7 @@
 		mousedown: function(ev) {
 
 			// Touch: Get the original event:
-			if (this.touchCapable && ev.type === 'touchstart') {
+			if (this.touchCapable && (ev.type === 'touchstart' || ev.type === 'click')) {
 				ev = ev.originalEvent;
 			}
 
@@ -219,12 +218,11 @@
 					touchmove: $.proxy(this.mousemove, this),
 					touchend: $.proxy(this.mouseup, this)
 				});
-			} else {
-				$(document).on({
-					mousemove: $.proxy(this.mousemove, this),
-					mouseup: $.proxy(this.mouseup, this)
-				});
 			}
+			$(document).on({
+				mousemove: $.proxy(this.mousemove, this),
+				mouseup: $.proxy(this.mouseup, this)
+			});
 
 			this.inDrag = true;
 			var val = this.calculateValue();
@@ -241,7 +239,7 @@
 		mousemove: function(ev) {
 
 			// Touch: Get the original event:
-			if (this.touchCapable && ev.type === 'touchmove') {
+			if (this.touchCapable && (ev.type === 'touchmove' || ev.type === 'click')) {
 				ev = ev.originalEvent;
 			}
 
@@ -269,18 +267,17 @@
 		},
 
 		mouseup: function(ev) {
-			if (this.touchCapable) {
+			if (this.touchCapable && (ev.type === 'touchend' || ev.type === 'click')) {
 				// Touch: Bind touch events:
 				$(document).off({
 					touchmove: this.mousemove,
 					touchend: this.mouseup
 				});
-			} else {
-				$(document).off({
-					mousemove: this.mousemove,
-					mouseup: this.mouseup
-				});
 			}
+			$(document).off({
+				mousemove: this.mousemove,
+				mouseup: this.mouseup
+			});
 
 			this.inDrag = false;
 			if (this.over === false) {
@@ -314,7 +311,7 @@
 		},
 
 		getPercentage: function(ev) {
-			if (this.touchCapable) {
+			if (this.touchCapable && (ev.type === 'touchstart' || ev.type === 'touchmove' || ev.type === 'click')) {
 				ev = ev.touches[0];
 			}
 			var percentage = (ev[this.mousePos] - this.offset[this.stylePos])*100/this.size;
